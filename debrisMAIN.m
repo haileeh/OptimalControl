@@ -17,47 +17,40 @@ clear all; close all; clc
 
 % Constants
 mu                  = 398601; %[km^3/s^2] %3.986012e14; %[m^3/s^2]
-thrusterForce       = 100; %[N]
+thrusterForce       = 200; %[N]
 initialMass         = 1088; %[kg], mass of ASTRO (orbital express); mp = 136kg
 g0                  = 9.80665; %[m/s^2]
-Isp                 = 400; %[s], chemical bipropellant
-
+Isp                 = 300; %[s], chemical bipropellant
 
 % Time
 t0 = 0;
 tfmin = 0; tfmax = 1000;
 %%%% Chaser - circular orbit with no inclination %%%%
 % initialize position
-CHA_x0 = 300; %[km]
-CHA_y0 = 180; %[km]
+CHA_x0 = 6600; %[km]
+CHA_y0 = -300; %[km]
 CHA_z0 = 0;   %[km]
 CHA_r0 = [CHA_x0, CHA_y0, CHA_z0];
 CHA_rmag = sqrt(CHA_x0^2 + CHA_y0^2 + CHA_z0^2); %[km]
 % initialize velocity
 CHA_vmag = sqrt(mu/CHA_rmag); %[km/s]
-CHA_vx0 = 0; %CHA_vmag*(CHA_x0/CHA_rmag);
-CHA_vy0 = 0; %CHA_vmag*(CHA_y0/CHA_rmag);
-CHA_vz0 = 0; %CHA_vmag*(CHA_z0/CHA_rmag);
+CHA_vx0 = CHA_vmag*(CHA_x0/CHA_rmag);
+CHA_vy0 = CHA_vmag*(CHA_y0/CHA_rmag);
+CHA_vz0 = CHA_vmag*(CHA_z0/CHA_rmag);
 CHA_v0 = [CHA_vx0,CHA_vy0,CHA_vz0];
-CHA_rmin = -50*ones(1,3); CHA_rmax = 1000*ones(1,3);
+CHA_rmin = -10000*ones(1,3); CHA_rmax = 10000*ones(1,3);
 CHA_vmin = -50*ones(1,3); CHA_vmax = 100*ones(1,3); 
 % Chaser mass
 m0 = initialMass;
 mmax = initialMass;
 mmin = 1;
 
-
-%%%% Target 1 - circular orbit %%%%
-% initial position
-TAR1_x0 = 195;  %[km]
-TAR1_y0 = 350;  %[km]
-TAR1_z0 = 0;  %[km]
+%%%% Target 1 - HETE-2 %%%%
+% initial position from Earth's center?
+TAR1_x0 = 6916;  %[km]
+TAR1_y0 = -325;  %[km]
+TAR1_z0 = 53;  %[km]
 TAR1_r0 = sqrt(TAR1_x0^2 + TAR1_y0^2 + TAR1_z0^2); %[km]
-% initial velocity
-TAR1_v0 = sqrt(mu/TAR1_r0); %[km/s]
-TAR1_vx0 = TAR1_v0*(TAR1_x0/TAR1_r0);
-TAR1_vy0 = TAR1_v0*(TAR1_y0/TAR1_r0);
-TAR1_vz0 = TAR1_v0*(TAR1_z0/TAR1_r0);
 
 CHA_xf = TAR1_x0; CHA_yf = TAR1_y0; CHA_zf = TAR1_z0; 
 % Control (for Chaser)

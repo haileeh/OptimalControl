@@ -10,6 +10,6 @@ finalstate = input.phase.finalstate;
 a = input.phase.integral;
 mf = input.phase.finalstate(7);
 output.objective = a-mf; 
-output.eventgroup.event = [finalstate(1)-195, finalstate(2)-350, finalstate(3)-0];
+output.eventgroup.event = [finalstate(1)-6916, finalstate(2)+325, finalstate(3)-53];
 
 end

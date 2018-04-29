@@ -20,7 +20,7 @@ CHA_rdot          = CHA_v;
 
 mdot              = -thrusterForce*ones(size(t))/(g0*Isp);
 r_mag             = sqrt(sum(CHA_r.*CHA_r,2));
-grav              = (-mu/50./r_mag.^3).*CHA_r;%(-mu./r_mag.^3).*CHA_r;
+grav              = (-1./r_mag.^3).*CHA_r;%(-mu./r_mag.^3).*CHA_r;
 thrust            = thrusterForce.*u./m; 
 CHA_vdot          = thrust+grav;
 phaseout.dynamics = [CHA_rdot,CHA_vdot,mdot];
