@@ -21,6 +21,7 @@ thrusterForce       = 200; %[N]
 initialMass         = 1088; %[kg], mass of ASTRO (orbital express); mp = 136kg
 g0                  = 9.80665; %[m/s^2]
 Isp                 = 300; %[s], chemical bipropellant
+TAR1Mass            = 124; %[kg]
 
 % Time
 t0 = 0;
@@ -42,7 +43,7 @@ CHA_rmin = -10000*ones(1,3); CHA_rmax = 10000*ones(1,3);
 CHA_vmin = -50*ones(1,3); CHA_vmax = 100*ones(1,3); 
 % Chaser mass
 m0 = initialMass;
-mmax = initialMass;
+mmax = 2*initialMass;
 mmin = 1;
 
 %%%% Target 1 - HETE-2 %%%%
@@ -62,41 +63,82 @@ auxdata.thrusterForce   = thrusterForce;
 auxdata.g0              = g0;
 auxdata.Isp             = Isp;
 auxdata.mu              = mu;
+auxdata.TAR1_x          = TAR1_x0;
+auxdata.TAR1_y          = TAR1_y0;
+auxdata.TAR1_z          = TAR1_z0;
+auxdata.TAR1Mass        = TAR1Mass;
 
 %-------------------------------------------------------------------------%
-%----------------------- Setup for Problem Bounds ------------------------%
+%----------------------Phase 1: Chaser to Target 1------------------------%
 %-------------------------------------------------------------------------%
+
+iphase = 1;
 % t0 fixed
-bounds.phase.initialtime.lower = t0; 
-bounds.phase.initialtime.upper = t0;
+bounds.phase(iphase).initialtime.lower = t0; 
+bounds.phase(iphase).initialtime.upper = t0;
 % tf free
-bounds.phase.finaltime.lower = tfmin; 
-bounds.phase.finaltime.upper = tfmax;
+bounds.phase(iphase).finaltime.lower = tfmin; 
+bounds.phase(iphase).finaltime.upper = tfmax;
 % initial positions and velocities fixed
-bounds.phase.initialstate.lower = [CHA_r0,CHA_v0,m0];
-bounds.phase.initialstate.upper = [CHA_r0,CHA_v0,m0];
-bounds.phase.state.lower = [CHA_rmin,CHA_vmin,mmin];
-bounds.phase.state.upper = [CHA_rmax,CHA_vmax,mmax];
+bounds.phase(iphase).initialstate.lower = [CHA_r0,CHA_v0,m0];
+bounds.phase(iphase).initialstate.upper = [CHA_r0,CHA_v0,m0];
+bounds.phase(iphase).state.lower = [CHA_rmin,CHA_vmin,mmin];
+bounds.phase(iphase).state.upper = [CHA_rmax,CHA_vmax,mmax];
 % final positions and velocities free
-bounds.phase.finalstate.lower = [CHA_rmin,CHA_vmin,mmin];
-bounds.phase.finalstate.upper = [CHA_rmax,CHA_vmax,mmax];
-bounds.phase.control.lower = [umin]; 
-bounds.phase.control.upper = [umax];
-bounds.phase.integral.lower = -100;
-bounds.phase.integral.upper = 100;
-bounds.eventgroup.lower = [0,0,0];
-bounds.eventgroup.upper = [0,0,0];
-bounds.phase.path.lower  = [1];
-bounds.phase.path.upper  = [1];
+bounds.phase(iphase).finalstate.lower = [CHA_rmin,CHA_vmin,mmin];
+bounds.phase(iphase).finalstate.upper = [CHA_rmax,CHA_vmax,mmax];
+bounds.phase(iphase).control.lower = [umin]; 
+bounds.phase(iphase).control.upper = [umax];
+bounds.phase(iphase).integral.lower = -100;
+bounds.phase(iphase).integral.upper = 100;
+bounds.eventgroup(1).lower = [0,0,0];
+bounds.eventgroup(1).upper = [0,0,0];
+bounds.phase(iphase).path.lower  = [1];
+bounds.phase(iphase).path.upper  = [1];
+guess.phase(iphase).time    = [t0; tfmax/5]; 
+guess.phase(iphase).state   = [[CHA_x0; CHA_xf],[CHA_y0; CHA_yf],[CHA_z0; CHA_zf],...
+    [CHA_vx0; CHA_vx0],[CHA_vy0; CHA_vy0],[CHA_vz0;CHA_vz0],[m0;mmin]];
+guess.phase(iphase).control = [[1;1],[0;0],[0;0]];
+guess.phase(iphase).integral = [50];
 
 %-------------------------------------------------------------------------%
-%---------------------- Provide Guess of Solution ------------------------%
+%----------------------Phase 2: Chaser drop off TAR1----------------------%
 %-------------------------------------------------------------------------%
-guess.phase.time    = [t0; tfmax/5]; 
-guess.phase.state   = [[CHA_x0; CHA_xf],[CHA_y0; CHA_yf],[CHA_z0; CHA_zf],...
-    [CHA_vx0; CHA_vx0],[CHA_vy0; CHA_vy0],[CHA_vz0;CHA_vz0],[m0;mmin]];
-guess.phase.control = [[1;1],[0;0],[0;0]];
-guess.phase.integral = [50];
+iphase = 2;
+% initial time of phase should equal end time of phase 1
+bounds.phase(iphase).initialtime.lower = tfmin; 
+bounds.phase(iphase).initialtime.upper = tfmax;
+% tf free
+bounds.phase(iphase).finaltime.lower = tfmin; 
+bounds.phase(iphase).finaltime.upper = tfmax;
+% initial positions and velocities constrained to that of phase 1
+bounds.phase(iphase).initialstate.lower = [CHA_rmin,CHA_vmin,mmin];
+bounds.phase(iphase).initialstate.upper = [CHA_rmax,CHA_vmax,mmax];
+bounds.phase(iphase).state.lower = [CHA_rmin,CHA_vmin,mmin];
+bounds.phase(iphase).state.upper = [CHA_rmax,CHA_vmax,mmax];
+% final positions and velocities free
+bounds.phase(iphase).finalstate.lower = [CHA_rmin,CHA_vmin,mmin];
+bounds.phase(iphase).finalstate.upper = [CHA_rmax,CHA_vmax,mmax];
+bounds.phase(iphase).control.lower = [umin]; 
+bounds.phase(iphase).control.upper = [umax];
+bounds.phase(iphase).integral.lower = -100;
+bounds.phase(iphase).integral.upper = 100;
+
+bounds.eventgroup(2).lower = [0*ones(1,6),TAR1Mass,0];
+bounds.eventgroup(2).upper = [0*ones(1,6),TAR1Mass,0];
+bounds.eventgroup(3).lower = [0*ones(1,3)];
+bounds.eventgroup(3).upper = [0*ones(1,3)];
+
+bounds.phase(iphase).path.lower  = [1];
+bounds.phase(iphase).path.upper  = [1];
+
+guess.phase(iphase).time    = [t0; tfmax/5]; 
+guess.phase(iphase).state   = [[CHA_xf; CHA_x0],[CHA_yf; CHA_y0],[CHA_zf; CHA_z0],...
+    [CHA_vx0; CHA_vx0],[CHA_vy0; CHA_vy0],[CHA_vz0;CHA_vz0],[m0;m0]];
+guess.phase(iphase).control = [[1;1],[0;0],[0;0]];
+guess.phase(iphase).integral = [50];
+
+% need eventgroup to enforce continuity
 
 %-------------------------------------------------------------------------%
 %----------Provide Mesh Refinement Method and Initial Mesh ---------------%
