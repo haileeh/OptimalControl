@@ -3,7 +3,6 @@
 %---------------------------------------------%
 function phaseout = debrisPickupContinuous(input)
 
-m_temp            = 50;  %[kg]
 thrusterForce     = input.auxdata.thrusterForce;
 g0                = input.auxdata.g0;
 Isp               = input.auxdata.Isp;
@@ -22,7 +21,7 @@ CHA_rdot          = CHA_v;
 
 mdot              = -thrusterForce*ones(size(t))/(g0*Isp);
 r_mag             = sqrt(sum(CHA_r.*CHA_r,2));
-grav              = (-1./r_mag.^3).*CHA_r;%(-mu./r_mag.^3).*CHA_r;
+grav              = (-mu./r_mag.^3).*CHA_r; %(-mu./r_mag.^3).*CHA_r;
 thrust            = thrusterForce.*u1./m; 
 CHA_vdot          = thrust+grav;
 phaseout(iphase).dynamics = [CHA_rdot,CHA_vdot,mdot];
@@ -42,7 +41,7 @@ CHA_rdot2          = CHA_v2;
 
 mdot2              = -thrusterForce*ones(size(t2))/(g0*Isp);
 r_mag2             = sqrt(sum(CHA_r2.*CHA_r2,2));
-grav2              = (-1./r_mag2.^3).*CHA_r2;%(-mu./r_mag.^3).*CHA_r;
+grav2              = (-mu./r_mag2.^3).*CHA_r2;%(-mu./r_mag.^3).*CHA_r;
 thrust2            = thrusterForce.*u2./m2; 
 CHA_vdot2          = thrust2+grav2;
 phaseout(iphase).dynamics = [CHA_rdot2,CHA_vdot2,mdot2];

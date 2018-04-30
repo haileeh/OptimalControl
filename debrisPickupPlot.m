@@ -113,7 +113,8 @@ set(xl,'FontSize',18);
 set(yl,'FontSize',18);
 set(zl,'FontSize',18);
 
-axis([minx-5 maxx+5 miny-5 maxy+5 minz-5 maxz+5]);
+m = 20;
+axis([minx-m maxx+m miny-m maxy+m minz-m maxz+m]);
 l = 2.5;
 %chaser = patch([x(1)-5 x(1)],[y(1)-5 y(1)], [z(1)-5 z(1)], 'r');
 %chaser = patch([x(1)-5 x(1)-5 x(1) x(1)],[y(1)-5 y(1) y(1) y(1)-5],'r');
