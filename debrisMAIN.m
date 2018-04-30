@@ -22,6 +22,8 @@ initialMass         = 1088; %[kg], mass of ASTRO (orbital express); mp = 136kg
 g0                  = 9.80665; %[m/s^2]
 Isp                 = 300; %[s], chemical bipropellant
 TAR1Mass            = 124; %[kg]
+TAR2Mass            = 110; %[kg]
+TAR3Mass            = 170; %[kg]
 
 % Time
 t0 = 0;
@@ -54,6 +56,17 @@ TAR1_z0 = 53;  %[km]
 TAR1_r0 = sqrt(TAR1_x0^2 + TAR1_y0^2 + TAR1_z0^2); %[km]
 
 CHA_xf = TAR1_x0; CHA_yf = TAR1_y0; CHA_zf = TAR1_z0; 
+
+%%%% Target 2 - Pegasus 3rd stage %%%%
+TAR2_x0 = 6080; %[km]
+TAR2_y0 = -3261; %[km]
+TAR2_z0 = -202; %[km]
+
+%%%% Target 3 - AGILE %%%%
+TAR3_x0 = 5993; %[km]
+TAR3_y0 = -3311; %[km]
+TAR3_z0 = 52; %[km]
+
 % Control (for Chaser)
 umin = -10*ones(1,3); 
 umax = 10*ones(1,3); 
