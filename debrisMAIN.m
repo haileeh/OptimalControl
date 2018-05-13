@@ -34,12 +34,15 @@ TAR3Mass            = 170; %[kg]
 
 % Time
 t0 = 0;
-tfmin = 0; tfmax = 1000;
+tfmin = 0; tfmax = 10000;
 %%%% Chaser - circular orbit with no inclination %%%%
 % initialize position
 CHA_x0 = 6600*n; %[km]
 CHA_y0 = -300*n; %[km]
 CHA_z0 = 0*n;   %[km]
+% CHA_x0 = 5996*n; %[km]
+%CHA_y0 = -2299*n; %[km]
+%CHA_z0 = -32*n;   %[km]
 CHA_r0 = [CHA_x0, CHA_y0, CHA_z0];
 CHA_rmag = sqrt(CHA_x0^2 + CHA_y0^2 + CHA_z0^2); %[km]
 % initialize velocity
@@ -105,6 +108,9 @@ auxdata.TAR1_z          = TAR1_z0;
 auxdata.TAR2_x          = TAR2_x0; 
 auxdata.TAR2_y          = TAR2_y0; 
 auxdata.TAR2_z          = TAR2_z0;
+auxdata.TAR3_x          = TAR3_x0; 
+auxdata.TAR3_y          = TAR3_y0; 
+auxdata.TAR3_z          = TAR3_z0;
 auxdata.TAR1Mass        = TAR1Mass;
 auxdata.TAR1_t          = TAR1_t;
 auxdata.TAR1_r          = TAR1_r;
@@ -130,15 +136,15 @@ bounds.phase(iphase).finalstate.lower = [CHA_rmin,CHA_vfixed_min,m0/2];
 bounds.phase(iphase).finalstate.upper = [CHA_rmax,CHA_vfixed_max,mmax];
 bounds.phase(iphase).control.lower = [umin]; 
 bounds.phase(iphase).control.upper = [umax];
-bounds.phase(iphase).integral.lower = -100;
-bounds.phase(iphase).integral.upper = 100;
+bounds.phase(iphase).integral.lower = -1000;
+bounds.phase(iphase).integral.upper = 1000;
 bounds.eventgroup(1).lower = [0,0,0];
 bounds.eventgroup(1).upper = [0,0,0];
 bounds.phase(iphase).path.lower  = [1];
 bounds.phase(iphase).path.upper  = [1];
-guess.phase(iphase).time    = [t0; tfmax/5]; 
+guess.phase(iphase).time    = [t0; 60]; 
 guess.phase(iphase).state   = [[CHA_x0; CHA_xf],[CHA_y0; CHA_yf],[CHA_z0; CHA_zf],...
-    [CHA_vx0; CHA_vx0],[CHA_vy0; CHA_vy0],[CHA_vz0;CHA_vz0],[m0;0.75*m0]];
+    [CHA_vx0; CHA_vx0],[CHA_vy0; CHA_vy0],[CHA_vz0;CHA_vz0],[m0;m0-10]];
 guess.phase(iphase).control = [[-1;-1],[0;0],[0;0]];
 guess.phase(iphase).integral = [60];
 
@@ -162,8 +168,8 @@ bounds.phase(iphase).finalstate.lower = [CHA_rmin,CHA_vmin,mmin];
 bounds.phase(iphase).finalstate.upper = [CHA_rmax,CHA_vmax,mmax];
 bounds.phase(iphase).control.lower = [umin]; 
 bounds.phase(iphase).control.upper = [umax];
-bounds.phase(iphase).integral.lower = -100;
-bounds.phase(iphase).integral.upper = 100;
+bounds.phase(iphase).integral.lower = -1000;
+bounds.phase(iphase).integral.upper = 1000;
 
 bounds.eventgroup(2).lower = [0*ones(1,6),TAR1Mass,0];
 bounds.eventgroup(2).upper = [0*ones(1,6),TAR1Mass,0];
@@ -173,9 +179,9 @@ bounds.eventgroup(3).upper = [0*ones(1,3)];
 bounds.phase(iphase).path.lower  = [1];
 bounds.phase(iphase).path.upper  = [1];
 
-guess.phase(iphase).time    = [t0; tfmax/10]; 
+guess.phase(iphase).time    = [60; 120]; 
 guess.phase(iphase).state   = [[CHA_xf; CHA_x0],[CHA_yf; CHA_y0],[CHA_zf; CHA_z0],...
-    [CHA_vx0; CHA_vx0],[CHA_vy0; CHA_vy0],[CHA_vz0;CHA_vz0],[m0+TAR1Mass;m0]];
+    [CHA_vx0; CHA_vx0],[CHA_vy0; CHA_vy0],[CHA_vz0;CHA_vz0],[m0-10+TAR1Mass;m0-20+TAR1Mass]];
 guess.phase(iphase).control = [[-1;-1],[0;0],[0;0]];
 guess.phase(iphase).integral = [60];
 
@@ -211,20 +217,134 @@ bounds.eventgroup(5).upper = [0*ones(1,3)];
 bounds.phase(iphase).path.lower  = [1];
 bounds.phase(iphase).path.upper  = [1];
 
-guess.phase(iphase).time    = [tfmax/20; tfmax/10]; 
+guess.phase(iphase).time    = [120; 460]; 
 guess.phase(iphase).state   = [[CHA_x0; TAR2_x0],[CHA_y0; TAR2_y0],[CHA_z0; TAR2_z0],...
-    [CHA_vx0; CHA_vfixed_max(1)],[CHA_vy0; CHA_vfixed_max(1)],[CHA_vz0;CHA_vfixed_max(1)],[m0;m0]];
+    [CHA_vx0; CHA_vfixed_max(1)],[CHA_vy0; CHA_vfixed_max(1)],[CHA_vz0;CHA_vfixed_max(1)],[m0-20;m0-40]];
+guess.phase(iphase).control = [[-1;-1],[0;0],[0;0]];
+guess.phase(iphase).integral = [60];
+
+%-------------------------------------------------------------------------%
+%----------------------Phase 4: Chaser drop off TAR2----------------------%
+%-------------------------------------------------------------------------%
+iphase = 4;
+% initial time of phase should equal end time of phase 3
+bounds.phase(iphase).initialtime.lower = tfmin; 
+bounds.phase(iphase).initialtime.upper = tfmax;
+% tf free
+bounds.phase(iphase).finaltime.lower = tfmin; 
+bounds.phase(iphase).finaltime.upper = tfmax;
+% initial positions and velocities constrained to that of phase 3
+bounds.phase(iphase).initialstate.lower = [CHA_rmin,CHA_vmin,mmin];
+bounds.phase(iphase).initialstate.upper = [CHA_rmax,CHA_vmax,mmax];
+bounds.phase(iphase).state.lower = [CHA_rmin,CHA_vmin,mmin];
+bounds.phase(iphase).state.upper = [CHA_rmax,CHA_vmax,mmax];
+% final positions and velocities free
+bounds.phase(iphase).finalstate.lower = [CHA_rmin,CHA_vfixed_min,mmin];
+bounds.phase(iphase).finalstate.upper = [CHA_rmax,CHA_vfixed_max,mmax];
+bounds.phase(iphase).control.lower = [umin]; 
+bounds.phase(iphase).control.upper = [umax];
+bounds.phase(iphase).integral.lower = -1000;
+bounds.phase(iphase).integral.upper = 1000;
+
+% what's the mass req now?
+bounds.eventgroup(6).lower = [0*ones(1,6),TAR2Mass,0];
+bounds.eventgroup(6).upper = [0*ones(1,6),TAR2Mass,0];
+bounds.eventgroup(7).lower = [0*ones(1,3)];
+bounds.eventgroup(7).upper = [0*ones(1,3)];
+
+bounds.phase(iphase).path.lower  = [1];
+bounds.phase(iphase).path.upper  = [1];
+
+guess.phase(iphase).time    = [460; 810]; 
+guess.phase(iphase).state   = [[TAR2_x0; CHA_x0],[TAR2_y0; CHA_y0],[TAR2_z0; CHA_z0],...
+    [CHA_vx0; CHA_vfixed_max(1)],[CHA_vy0; CHA_vfixed_max(1)],[CHA_vz0;CHA_vfixed_max(1)],[m0-40+TAR2Mass;m0-80+TAR2Mass]];
+guess.phase(iphase).control = [[-1;-1],[0;0],[0;0]];
+guess.phase(iphase).integral = [60];
+
+%-------------------------------------------------------------------------%
+%----------------------Phase 5: Chaser pick up TAR3-----------------------%
+%-------------------------------------------------------------------------%
+iphase = 5;
+% initial time of phase should equal end time of phase 4
+bounds.phase(iphase).initialtime.lower = tfmin; 
+bounds.phase(iphase).initialtime.upper = tfmax;
+% tf free
+bounds.phase(iphase).finaltime.lower = tfmin; 
+bounds.phase(iphase).finaltime.upper = tfmax;
+% initial positions and velocities constrained to that of phase 4
+bounds.phase(iphase).initialstate.lower = [CHA_rmin,CHA_vmin,mmin];
+bounds.phase(iphase).initialstate.upper = [CHA_rmax,CHA_vmax,mmax];
+bounds.phase(iphase).state.lower = [CHA_rmin,CHA_vmin,mmin];
+bounds.phase(iphase).state.upper = [CHA_rmax,CHA_vmax,mmax];
+% final positions and velocities free
+bounds.phase(iphase).finalstate.lower = [CHA_rmin,CHA_vfixed_min,mmin];
+bounds.phase(iphase).finalstate.upper = [CHA_rmax,CHA_vfixed_max,mmax];
+bounds.phase(iphase).control.lower = [umin]; 
+bounds.phase(iphase).control.upper = [umax];
+bounds.phase(iphase).integral.lower = -1000;
+bounds.phase(iphase).integral.upper = 1000;
+
+% what's the mass req now?
+bounds.eventgroup(8).lower = [0*ones(1,6),-TAR2Mass,0];
+bounds.eventgroup(8).upper = [0*ones(1,6),-TAR2Mass,0];
+bounds.eventgroup(9).lower = [0*ones(1,3)];
+bounds.eventgroup(9).upper = [0*ones(1,3)];
+
+bounds.phase(iphase).path.lower  = [1];
+bounds.phase(iphase).path.upper  = [1];
+
+guess.phase(iphase).time    = [810; 1000]; 
+guess.phase(iphase).state   = [[CHA_x0; TAR3_x0],[CHA_y0; TAR3_y0],[CHA_z0; TAR3_z0],...
+    [CHA_vx0; CHA_vfixed_max(1)],[CHA_vy0; CHA_vfixed_max(1)],[CHA_vz0;CHA_vfixed_max(1)],[m0-80;m0-120]];
+guess.phase(iphase).control = [[-1;-1],[0;0],[0;0]];
+guess.phase(iphase).integral = [60];
+
+%-------------------------------------------------------------------------%
+%----------------------Phase 6: Chaser drops off TAR3----------------------%
+%-------------------------------------------------------------------------%
+iphase = 6;
+% initial time of phase should equal end time of phase 5
+bounds.phase(iphase).initialtime.lower = tfmin; 
+bounds.phase(iphase).initialtime.upper = tfmax;
+% tf free
+bounds.phase(iphase).finaltime.lower = tfmin; 
+bounds.phase(iphase).finaltime.upper = tfmax;
+% initial positions and velocities constrained to that of phase 5
+bounds.phase(iphase).initialstate.lower = [CHA_rmin,CHA_vmin,mmin];
+bounds.phase(iphase).initialstate.upper = [CHA_rmax,CHA_vmax,mmax];
+bounds.phase(iphase).state.lower = [CHA_rmin,CHA_vmin,mmin];
+bounds.phase(iphase).state.upper = [CHA_rmax,CHA_vmax,mmax];
+% final positions and velocities free
+bounds.phase(iphase).finalstate.lower = [CHA_rmin,CHA_vfixed_min,mmin];
+bounds.phase(iphase).finalstate.upper = [CHA_rmax,CHA_vfixed_max,mmax];
+bounds.phase(iphase).control.lower = [umin]; 
+bounds.phase(iphase).control.upper = [umax];
+bounds.phase(iphase).integral.lower = -1000;
+bounds.phase(iphase).integral.upper = 1000;
+
+% what's the mass req now?
+bounds.eventgroup(10).lower = [0*ones(1,6),TAR3Mass,0];
+bounds.eventgroup(10).upper = [0*ones(1,6),TAR3Mass,0];
+bounds.eventgroup(11).lower = [0*ones(1,3)];
+bounds.eventgroup(11).upper = [0*ones(1,3)];
+
+bounds.phase(iphase).path.lower  = [1];
+bounds.phase(iphase).path.upper  = [1];
+
+guess.phase(iphase).time    = [1000; 1300]; 
+guess.phase(iphase).state   = [[TAR3_x0; CHA_x0],[TAR3_y0; CHA_y0],[TAR3_z0; CHA_z0],...
+    [CHA_vx0; CHA_vfixed_max(1)],[CHA_vy0; CHA_vfixed_max(1)],[CHA_vz0;CHA_vfixed_max(1)],[m0-120+TAR3Mass;m0-160+TAR3Mass]];
 guess.phase(iphase).control = [[-1;-1],[0;0],[0;0]];
 guess.phase(iphase).integral = [60];
 
 %-------------------------------------------------------------------------%
 %----------Provide Mesh Refinement Method and Initial Mesh ---------------%
 %-----------------------------------------------------------------------x--%
-mesh.tolerance    = 1e-6;
-mesh.maxiterations = 40;
+mesh.tolerance    = 1e-4;%1e-6;
+mesh.maxiterations = 80;
 mesh.colpointsmin = 4;
 mesh.colpointsmax = 50;
-for i=1:3
+for i=1:6
   meshphase(i).colpoints = 4*ones(1,10);
   meshphase(i).fraction = 0.1*ones(1,10);
 end
@@ -241,7 +361,7 @@ setup.guess                       = guess;
 setup.mesh                        = mesh; 
 setup.mesh.phase                  = meshphase;
 setup.nlp.solver                  = 'ipopt';
-setup.derivatives.supplier        = 'adigator'; %'sparseCD'; %sparceCD finds optimal, sparceFD only finds acceptable level
+setup.derivatives.supplier        = 'sparseCD'; %sparceCD finds optimal, sparceFD only finds acceptable level
 setup.derivatives.derivativelevel = 'second';
 setup.derivatives.dependencies    = 'sparseNaN';
 setup.method                      = 'RPM-Differentiation';
@@ -269,7 +389,7 @@ if 1
         scales.phase(i).pathconscale = 0.0513;
     end
     
-    for i=3
+    for i=3:6
         scales.phase(i).statescale = 6*[3.9197e-05 3.9197e-05 3.9197e-05 0.0500 0.0500 0.0500 6.1275e-04]; %4.5958e-04
         scales.phase(i).stateshift = [0 0 0 0 0 0 -0.8333]; %-0.5
         scales.phase(i).controlscale = [0.0500 0.0500 0.0500];
@@ -281,7 +401,7 @@ if 1
         scales.phase(i).integralscale = 0.005;
         scales.phase(i).integralshift = 0;
         scales.phase(i).integrandconscale = 0.005;
-        scales.phase(i).dynamicsconscale = 0.25*[3.9197e-05 3.9197e-05 3.9197e-05 0.0500 0.0500 0.0500 6.1275e-04]; %4.5958e-04
+        scales.phase(i).dynamicsconscale = 0.5*[3.9197e-05 3.9197e-05 3.9197e-05 0.0500 0.0500 0.0500 6.1275e-04]; %4.5958e-04
         scales.phase(i).pathconscale = 0.0513; %0.0545
     end
     
@@ -290,6 +410,12 @@ if 1
     scales.eventgroup(3).eventconscale = [0.7071 0.7071 0.7071];
     scales.eventgroup(4).eventconscale = [0.7071 0.7071 0.7071 0.7071 0.7071 0.7071 0.7071 0.7071];
     scales.eventgroup(5).eventconscale = [0.7071 0.7071 0.7071]; %[1 1.0000 1.0000];
+    scales.eventgroup(6).eventconscale = [0.7071 0.7071 0.7071 0.7071 0.7071 0.7071 0.7071 0.7071];
+    scales.eventgroup(7).eventconscale = [0.7071 0.7071 0.7071]; %[1 1.0000 1.0000];
+    scales.eventgroup(8).eventconscale = [0.7071 0.7071 0.7071 0.7071 0.7071 0.7071 0.7071 0.7071];
+    scales.eventgroup(9).eventconscale = [0.7071 0.7071 0.7071]; %[1 1.0000 1.0000];
+    scales.eventgroup(10).eventconscale = [0.7071 0.7071 0.7071 0.7071 0.7071 0.7071 0.7071 0.7071];
+    scales.eventgroup(11).eventconscale = [0.7071 0.7071 0.7071]; %[1 1.0000 1.0000];
     
     setup.scales = scales;
 end

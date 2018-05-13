@@ -82,6 +82,81 @@ phaseout(iphase).dynamics = [CHA_rdot3,CHA_vdot3,mdot3];
 phaseout(iphase).integrand = ones(length(input.phase(iphase).time),1);
 
 phaseout(iphase).path = [sum(u3.*u3,2)];
+
+%%%% Phase 4
+iphase = 4;
+t4 = input.phase(iphase).time;
+CHA_r4 = input.phase(iphase).state(:,1:3);
+CHA_v4 = input.phase(iphase).state(:,4:6);
+m4 = input.phase(iphase).state(:,7);
+u4 = input.phase(iphase).control;
+
+CHA_rdot4 = CHA_v4;
+
+mdot4 = -thrusterForce*ones(size(t4))/(g0*Isp);
+r_mag4 = sqrt(sum(CHA_r4.*CHA_r4,2));
+%grav3 = (-mu./r_mag3.^3).*CHA_r3;%(-mu./r_mag.^3).*CHA_r;
+%thrust3 = thrusterForce.*u3./m3; 
+for i = 1:3
+    grav4(:,i) = (-mu./r_mag4.^(3)).*CHA_r4(:,i);
+    thrust4(:,i) = thrusterForce*u4(:,i)./m4;
+end
+CHA_vdot4 = thrust4+grav4;
+phaseout(iphase).dynamics = [CHA_rdot4,CHA_vdot4,mdot4];
+
+phaseout(iphase).integrand = ones(length(input.phase(iphase).time),1);
+
+phaseout(iphase).path = [sum(u4.*u4,2)];
+
+%%%% Phase 5
+iphase = 5;
+t5 = input.phase(iphase).time;
+CHA_r5 = input.phase(iphase).state(:,1:3);
+CHA_v5 = input.phase(iphase).state(:,4:6);
+m5 = input.phase(iphase).state(:,7);
+u5 = input.phase(iphase).control;
+
+CHA_rdot5 = CHA_v5;
+
+mdot5 = -thrusterForce*ones(size(t5))/(g0*Isp);
+r_mag5 = sqrt(sum(CHA_r5.*CHA_r5,2));
+%grav3 = (-mu./r_mag3.^3).*CHA_r3;%(-mu./r_mag.^3).*CHA_r;
+%thrust3 = thrusterForce.*u3./m3; 
+for i = 1:3
+    grav5(:,i) = (-mu./r_mag5.^(3)).*CHA_r5(:,i);
+    thrust5(:,i) = thrusterForce*u5(:,i)./m5;
+end
+CHA_vdot5 = thrust5+grav5;
+phaseout(iphase).dynamics = [CHA_rdot5,CHA_vdot5,mdot5];
+
+phaseout(iphase).integrand = ones(length(input.phase(iphase).time),1);
+
+phaseout(iphase).path = [sum(u5.*u5,2)];
+
+%%%% Phase 6
+iphase = 6;
+t6 = input.phase(iphase).time;
+CHA_r6 = input.phase(iphase).state(:,1:3);
+CHA_v6 = input.phase(iphase).state(:,4:6);
+m6 = input.phase(iphase).state(:,7);
+u6 = input.phase(iphase).control;
+
+CHA_rdot6 = CHA_v6;
+
+mdot6 = -thrusterForce*ones(size(t6))/(g0*Isp);
+r_mag6 = sqrt(sum(CHA_r6.*CHA_r6,2));
+%grav3 = (-mu./r_mag3.^3).*CHA_r3;%(-mu./r_mag.^3).*CHA_r;
+%thrust3 = thrusterForce.*u3./m3; 
+for i = 1:3
+    grav6(:,i) = (-mu./r_mag6.^(3)).*CHA_r6(:,i);
+    thrust6(:,i) = thrusterForce*u6(:,i)./m6;
+end
+CHA_vdot6 = thrust6+grav6;
+phaseout(iphase).dynamics = [CHA_rdot6,CHA_vdot6,mdot6];
+
+phaseout(iphase).integrand = ones(length(input.phase(iphase).time),1);
+
+phaseout(iphase).path = [sum(u6.*u6,2)];
 %---------------------------------------------%
 % END: function debrisPickupContinuous.m %
 %---------------------------------------------%
